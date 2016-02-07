@@ -103,7 +103,7 @@ public ParseObject POPasParseObject() {
 	return this;
 }
 ```
-##ToString method generation
+##toString method generation
 We can make the tool autogenerate, or better, auto-override, the *toString()* method passing a StringFormat and an array of field names as parameters for the StringFormat
 Example:
 ```java
@@ -170,15 +170,15 @@ public void POPset_value(boolean value) {
 	put("value", value);
 }
 ```
-#####List<String>
+#####List<? extends Object>
 ```java
-stringArrays={"value"}
+lists={"value"}
 ```
 ```java
-public List<String> POPget_value() {
-	return this.<String>getList("value");
+public <T> List<T> POPget_value() {
+	return this.<T>getList("value");
 }
-public void POPset_value(List<String> value) {
+public void POPset_value(List value) {
 	put("value", value);
 }
 ```
@@ -239,9 +239,8 @@ public <T extends ParseObject> ParseRelation<T> POPget_value() {
 	return this.<T>getRelation("value");
 }
 ```
+#Credits
+* [JavaPoet](https://github.com/square/javapoet)
 
-
-
-
-
-
+#License
+* [Apache Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
