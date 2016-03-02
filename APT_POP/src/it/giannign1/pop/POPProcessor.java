@@ -86,10 +86,12 @@ public class POPProcessor extends AbstractProcessor {
                 }
                 for (String field_int : annotationPOPParseObject.ints()) {
                 	subClassBuilder.addMethods(this.generateGetterSetter(int.class, field_int));
+                	subClassBuilder.addMethod(this.generateExistsForPrimitiveValue(int.class, field_int));
                     subClassBuilder.addField(this.generateStaticField(field_int));
                 }
                 for (String field_boolean : annotationPOPParseObject.booleans()) {
                 	subClassBuilder.addMethods(this.generateGetterSetter(boolean.class, field_boolean));
+                	subClassBuilder.addMethod(this.generateExistsForPrimitiveValue(boolean.class, field_boolean));
                     subClassBuilder.addField(this.generateStaticField(field_boolean));
                 }
                 for (String field_geopoints : annotationPOPParseObject.geopoints()) {
@@ -202,14 +204,22 @@ public class POPProcessor extends AbstractProcessor {
                 MethodSpec.methodBuilder((fieldType == boolean.class ? "POPis_" : "POPget_") + fieldName)
                     .addModifiers(Modifier.PUBLIC)
                     .returns(fieldType)
-                    .addStatement("return get$L($S)", fieldType.getSimpleName().toUpperCase(Locale.getDefault()).charAt(0) + fieldType.getSimpleName().substring(1), fieldName)
+                    .addStatement("return get$L($L$L)", fieldType.getSimpleName().toUpperCase(Locale.getDefault()).charAt(0) + fieldType.getSimpleName().substring(1), "POPkey_", fieldName)
                     .build(),
                 MethodSpec.methodBuilder("POPset_" + fieldName)
                     .addModifiers(Modifier.PUBLIC)
                     .returns(void.class)
                     .addParameter(fieldType, fieldName)
-                    .addStatement("put($S, $N)", fieldName, fieldName)
+                    .addStatement("put($L$L, $N)", "POPkey_", fieldName, fieldName)
                     .build()});
+    }
+	private MethodSpec generateExistsForPrimitiveValue(Class<?> fieldType, String fieldName) {
+		this._Messager.printMessage(Diagnostic.Kind.NOTE, String.format("---Generating method POPexists_" + fieldName), null);
+		return MethodSpec.methodBuilder("POPexists_" + fieldName)
+                    .addModifiers(Modifier.PUBLIC)
+                    .returns(boolean.class)
+                    .addStatement("return containsKey($L$L)", "POPkey_", fieldName)
+                    .build();
     }
     private Iterable<MethodSpec> generateParseObjectGetterSetter(String fieldName) {
     	this._Messager.printMessage(Diagnostic.Kind.NOTE, String.format("---Generating methods %s and %s", "POPget_" + fieldName, "POPset_" + fieldName), null);
@@ -219,13 +229,13 @@ public class POPProcessor extends AbstractProcessor {
                     .addModifiers(Modifier.PUBLIC)
                     .addTypeVariable(typeVariableName)
                     .returns(typeVariableName)
-                    .addStatement("return (T)this.getParseObject($S)", fieldName)
+                    .addStatement("return (T)this.getParseObject($L$L)", "POPkey_", fieldName)
                     .build(),
                 MethodSpec.methodBuilder("POPset_" + fieldName)
                     .addModifiers(Modifier.PUBLIC)
                     .returns(void.class)
                     .addParameter(ParseObject.class, fieldName)
-                    .addStatement("put($S, $N)", fieldName, fieldName)
+                    .addStatement("put($L$L, $N)", "POPkey_", fieldName, fieldName)
                     .build()});
 	}
 
@@ -237,13 +247,13 @@ public class POPProcessor extends AbstractProcessor {
                     .addModifiers(Modifier.PUBLIC)
                     .addTypeVariable(typeVariableName)
                     .returns(ParameterizedTypeName.get(ClassName.get(List.class), typeVariableName))
-                    .addStatement("return this.<T>getList($S)", fieldName)
+                    .addStatement("return this.<T>getList($L$L)", "POPkey_", fieldName)
                     .build(),
                 MethodSpec.methodBuilder("POPset_" + fieldName)
                     .addModifiers(Modifier.PUBLIC)
                     .returns(void.class)
                     .addParameter(List.class, fieldName)
-                    .addStatement("put($S, $N)", fieldName, fieldName)
+                    .addStatement("put($L$L, $N)", "POPkey_", fieldName, fieldName)
                     .build()});
     }
 	private Iterable<MethodSpec> generateDateGetterSetter(String fieldName) {
@@ -252,13 +262,13 @@ public class POPProcessor extends AbstractProcessor {
                 MethodSpec.methodBuilder("POPget_" + fieldName)
                     .addModifiers(Modifier.PUBLIC)
                     .returns(Date.class)
-                    .addStatement("return ($T)this.get($S)", Date.class, fieldName)
+                    .addStatement("return ($T)this.get($L$L)", Date.class, "POPkey_", fieldName)
                     .build(),
                 MethodSpec.methodBuilder("POPset_" + fieldName)
                     .addModifiers(Modifier.PUBLIC)
                     .returns(void.class)
                     .addParameter(Date.class, fieldName)
-                    .addStatement("this.put($S, $N)", fieldName, fieldName)
+                    .addStatement("this.put($L$L, $N)", "POPkey_", fieldName, fieldName)
                     .build()});
     }
 }
