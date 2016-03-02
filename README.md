@@ -151,11 +151,17 @@ public void POPset_value(String value) {
 ints={"value"}
 ```
 ```java
-public String POPget_value() {
+public int POPget_value() {
 	return getInt("value");
 }
 public void POPset_value(int value) {
 	put("value", value);
+}
+```
+#######For primitive values an exist method is also created because if no "value" is found, getInt returns 0
+```java
+public boolean POPexists_value() {
+	return containsKey("value");
 }
 ```
 #####boolean
@@ -168,6 +174,12 @@ public boolean POPis_value() {
 }
 public void POPset_value(boolean value) {
 	put("value", value);
+}
+```
+#######For primitive values an exist method is also created because if no "value" is found, getBoolean returns false
+```java
+public boolean POPexists_value() {
+	return containsKey("value");
 }
 ```
 #####List<? extends Object>
